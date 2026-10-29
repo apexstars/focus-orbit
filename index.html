@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Earn guilt-free break time by completing focused work sessions." />
+    <title>Focus Orbit — Make attention count</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <header class="site-header">
+      <a class="brand" href="#" aria-label="Focus Orbit home">
+        <span class="brand-mark" aria-hidden="true"><span></span></span>
+        <span>Focus Orbit</span>
+      </a>
+      <p class="privacy-note"><span></span> Everything stays on this device</p>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">ATTENTION, RECLAIMED</p>
+          <h1>Make focus feel<br /><em>rewarding.</em></h1>
+          <p class="hero-description">Turn intentional work into guilt-free break time. No blockers, shame, or surveillance—just a calmer loop that works with your brain.</p>
+          <div class="mini-proof">
+            <span class="proof-orbit" aria-hidden="true">✦</span>
+            <p><strong id="total-earned">0 minutes</strong> of intentional break time earned</p>
+          </div>
+        </div>
+
+        <div class="timer-card" aria-labelledby="timer-heading">
+          <div class="card-topline">
+            <div>
+              <p class="card-label">CURRENT ORBIT</p>
+              <h2 id="timer-heading">Deep focus</h2>
+            </div>
+            <label class="duration-control">
+              <span>Length</span>
+              <select id="duration-select" aria-label="Session length">
+                <option value="15">15 min</option>
+                <option value="25" selected>25 min</option>
+                <option value="45">45 min</option>
+                <option value="60">60 min</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="timer-wrap">
+            <svg class="timer-ring" viewBox="0 0 220 220" role="img" aria-label="Session progress">
+              <circle class="ring-track" cx="110" cy="110" r="96"></circle>
+              <circle id="ring-progress" class="ring-progress" cx="110" cy="110" r="96"></circle>
+            </svg>
+            <div class="timer-display">
+              <span id="timer-value">25:00</span>
+              <small id="timer-status">READY WHEN YOU ARE</small>
+            </div>
+          </div>
+
+          <div class="timer-actions">
+            <button id="reset-button" class="icon-button" type="button" aria-label="Reset timer">↺</button>
+            <button id="start-button" class="primary-button" type="button"><span>Start focus</span><span aria-hidden="true">→</span></button>
+          </div>
+          <p class="reward-note">Complete this orbit to earn <strong id="reward-preview">5 break credits</strong></p>
+        </div>
+      </section>
+
+      <section class="dashboard" aria-label="Today's focus summary">
+        <article class="stat-card accent-card">
+          <div class="stat-icon">◎</div>
+          <div><span>BREAK CREDITS</span><strong id="credit-count">0</strong><small>minutes available</small></div>
+          <button id="spend-button" type="button" disabled>Take a break</button>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-icon warm">↗</div>
+          <div><span>TODAY'S GOAL</span><strong><span id="session-count">0</span> / <span id="goal-count">3</span></strong><small>focus orbits</small></div>
+          <div class="goal-progress"><span id="goal-progress"></span></div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-icon violet">✦</div>
+          <div><span>CURRENT STREAK</span><strong><span id="streak-count">0</span> days</strong><small id="streak-message">Begin your first orbit</small></div>
+        </article>
+      </section>
+
+      <section class="activity-section">
+        <div class="section-heading">
+          <div><p class="eyebrow">YOUR MOMENTUM</p><h2>Recent orbits</h2></div>
+          <button id="clear-button" class="text-button" type="button">Clear history</button>
+        </div>
+        <div id="activity-list" class="activity-list" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <template id="empty-template">
+      <div class="empty-state">
+        <span>◌</span>
+        <div><strong>Your first orbit starts here.</strong><p>Completed focus sessions will appear in this timeline.</p></div>
+      </div>
+    </template>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
