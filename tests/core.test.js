@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { calculateStreak, formatTime, progressRatio, rewardForMinutes } from "../src/core.js";
+import { calculateStreak, canSpendCredits, formatTime, progressRatio, rewardForMinutes, spendCredits } from "../src/core.js";
 
 test("formats countdown values", () => {
   assert.equal(formatTime(1500), "25:00");
@@ -11,6 +11,15 @@ test("formats countdown values", () => {
 test("calculates earned break credits", () => {
   assert.equal(rewardForMinutes(25), 5);
   assert.equal(rewardForMinutes(45), 9);
+  assert.equal(rewardForMinutes(25, 10), 3);
+  assert.equal(rewardForMinutes(25, 0), 5);
+});
+
+test("spends credits only when the full break is affordable", () => {
+  assert.equal(canSpendCredits(10, 5), true);
+  assert.equal(canSpendCredits(4, 5), false);
+  assert.equal(spendCredits(10, 5), 5);
+  assert.equal(spendCredits(4, 5), 4);
 });
 
 test("clamps timer progress", () => {

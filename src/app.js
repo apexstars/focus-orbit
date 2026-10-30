@@ -1,4 +1,4 @@
-import { calculateStreak, formatTime, progressRatio, rewardForMinutes } from "./core.js";
+import { calculateStreak, canSpendCredits, formatTime, progressRatio, rewardForMinutes, spendCredits } from "./core.js";
 
 const STORAGE_KEY = "focus-orbit-v1";
 const ringCircumference = 2 * Math.PI * 96;
@@ -21,16 +21,34 @@ const elements = {
   spend: document.querySelector("#spend-button"),
   clear: document.querySelector("#clear-button"),
   activity: document.querySelector("#activity-list"),
-  emptyTemplate: document.querySelector("#empty-template")
+  emptyTemplate: document.querySelector("#empty-template"),
+  settingsButton: document.querySelector("#settings-button"),
+  settingsDialog: document.querySelector("#settings-dialog"),
+  settingsForm: document.querySelector("#settings-form"),
+  focusPerCredit: document.querySelector("#focus-per-credit"),
+  breakLength: document.querySelector("#break-length"),
+  dailyGoal: document.querySelector("#daily-goal"),
+  breakDialog: document.querySelector("#break-dialog"),
+  breakTimer: document.querySelector("#break-timer"),
+  endBreak: document.querySelector("#end-break-button")
 };
 
-const defaultData = { credits: 0, totalEarned: 0, dailyGoal: 3, sessions: [] };
+const defaultData = {
+  credits: 0,
+  totalEarned: 0,
+  dailyGoal: 3,
+  focusMinutesPerCredit: 5,
+  breakLength: 5,
+  sessions: []
+};
 let data = loadData();
 let selectedMinutes = Number(elements.duration.value);
 let totalSeconds = selectedMinutes * 60;
 let remainingSeconds = totalSeconds;
 let timerId = null;
 let running = false;
+let breakTimerId = null;
+let breakSeconds = data.breakLength * 60;
 
 function loadData() {
   try {
@@ -71,8 +89,9 @@ function renderDashboard() {
   elements.goalProgress.style.width = `${Math.min(100, (sessions.length / data.dailyGoal) * 100)}%`;
   elements.streak.textContent = streak;
   elements.streakMessage.textContent = streak ? "Keep the rhythm alive" : "Begin your first orbit";
-  elements.spend.disabled = data.credits < 5;
-  elements.reward.textContent = `${rewardForMinutes(selectedMinutes)} break credits`;
+  elements.spend.disabled = !canSpendCredits(data.credits, data.breakLength);
+  elements.spend.textContent = `Take a ${data.breakLength} min break`;
+  elements.reward.textContent = `${rewardForMinutes(selectedMinutes, data.focusMinutesPerCredit)} break credits`;
   renderActivity();
 }
 
@@ -117,7 +136,7 @@ function tick() {
 function completeSession() {
   window.clearInterval(timerId);
   running = false;
-  const reward = rewardForMinutes(selectedMinutes);
+  const reward = rewardForMinutes(selectedMinutes, data.focusMinutesPerCredit);
   data.credits += reward;
   data.totalEarned += reward;
   data.sessions.push({ minutes: selectedMinutes, reward, completedAt: new Date().toISOString() });
@@ -144,12 +163,11 @@ elements.duration.addEventListener("change", () => {
 elements.start.addEventListener("click", toggleTimer);
 elements.reset.addEventListener("click", resetTimer);
 elements.spend.addEventListener("click", () => {
-  if (data.credits < 5) return;
-  data.credits -= 5;
+  if (!canSpendCredits(data.credits, data.breakLength)) return;
+  data.credits = spendCredits(data.credits, data.breakLength);
   saveData();
   renderDashboard();
-  elements.spend.textContent = "5 minutes unlocked ✓";
-  window.setTimeout(() => { elements.spend.textContent = "Take a break"; }, 1800);
+  startBreak();
 });
 elements.clear.addEventListener("click", () => {
   data.sessions = [];
@@ -158,6 +176,51 @@ elements.clear.addEventListener("click", () => {
   saveData();
   renderDashboard();
 });
+
+elements.settingsButton.addEventListener("click", () => {
+  elements.focusPerCredit.value = data.focusMinutesPerCredit;
+  elements.breakLength.value = data.breakLength;
+  elements.dailyGoal.value = data.dailyGoal;
+  elements.settingsDialog.showModal();
+});
+
+elements.settingsForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  if (event.submitter?.value === "cancel") {
+    elements.settingsDialog.close();
+    return;
+  }
+  if (!elements.settingsForm.reportValidity()) return;
+  data.focusMinutesPerCredit = Number(elements.focusPerCredit.value);
+  data.breakLength = Number(elements.breakLength.value);
+  data.dailyGoal = Number(elements.dailyGoal.value);
+  saveData();
+  renderDashboard();
+  elements.settingsDialog.close();
+});
+
+elements.endBreak.addEventListener("click", endBreak);
+
+function startBreak() {
+  window.clearInterval(breakTimerId);
+  breakSeconds = data.breakLength * 60;
+  renderBreakTimer();
+  elements.breakDialog.showModal();
+  breakTimerId = window.setInterval(() => {
+    breakSeconds -= 1;
+    renderBreakTimer();
+    if (breakSeconds <= 0) endBreak();
+  }, 1000);
+}
+
+function renderBreakTimer() {
+  elements.breakTimer.textContent = formatTime(breakSeconds);
+}
+
+function endBreak() {
+  window.clearInterval(breakTimerId);
+  if (elements.breakDialog.open) elements.breakDialog.close();
+}
 
 renderTimer();
 renderDashboard();

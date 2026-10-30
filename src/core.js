@@ -1,4 +1,14 @@
-export const rewardForMinutes = (minutes) => Math.max(1, Math.round(minutes / 5));
+export const rewardForMinutes = (minutes, focusMinutesPerCredit = 5) => {
+  const rate = Math.max(1, Number(focusMinutesPerCredit) || 5);
+  return Math.max(1, Math.round(minutes / rate));
+};
+
+export const canSpendCredits = (credits, cost) => credits >= cost && cost > 0;
+
+export const spendCredits = (credits, cost) => {
+  if (!canSpendCredits(credits, cost)) return credits;
+  return credits - cost;
+};
 
 export const formatTime = (seconds) => {
   const safeSeconds = Math.max(0, Math.floor(seconds));
