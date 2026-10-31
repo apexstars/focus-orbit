@@ -1,4 +1,4 @@
-import { calculateStreak, canSpendCredits, formatTime, progressRatio, rewardForMinutes, spendCredits } from "./core.js";
+import { addUniqueDistraction, calculateStreak, canSpendCredits, formatTime, progressRatio, rewardForMinutes, spendCredits } from "./core.js";
 
 const STORAGE_KEY = "focus-orbit-v1";
 const ringCircumference = 2 * Math.PI * 96;
@@ -30,7 +30,20 @@ const elements = {
   dailyGoal: document.querySelector("#daily-goal"),
   breakDialog: document.querySelector("#break-dialog"),
   breakTimer: document.querySelector("#break-timer"),
-  endBreak: document.querySelector("#end-break-button")
+  endBreak: document.querySelector("#end-break-button"),
+  interventionButton: document.querySelector("#intervention-button"),
+  interventionDialog: document.querySelector("#intervention-dialog"),
+  interventionBreathe: document.querySelector("#intervention-breathe"),
+  interventionChoice: document.querySelector("#intervention-choice"),
+  interventionDistraction: document.querySelector("#intervention-distraction"),
+  breathCount: document.querySelector("#breath-count"),
+  closeIntervention: document.querySelector("#close-intervention-button"),
+  returnFocus: document.querySelector("#return-focus-button"),
+  continueIntentionally: document.querySelector("#continue-button"),
+  distractionForm: document.querySelector("#distraction-form"),
+  distractionInput: document.querySelector("#distraction-input"),
+  distractionList: document.querySelector("#distraction-list"),
+  urgeCount: document.querySelector("#urge-count")
 };
 
 const defaultData = {
@@ -39,6 +52,8 @@ const defaultData = {
   dailyGoal: 3,
   focusMinutesPerCredit: 5,
   breakLength: 5,
+  distractions: [],
+  interventions: [],
   sessions: []
 };
 let data = loadData();
@@ -49,6 +64,8 @@ let timerId = null;
 let running = false;
 let breakTimerId = null;
 let breakSeconds = data.breakLength * 60;
+let breathTimerId = null;
+let breathSeconds = 5;
 
 function loadData() {
   try {
@@ -93,6 +110,50 @@ function renderDashboard() {
   elements.spend.textContent = `Take a ${data.breakLength} min break`;
   elements.reward.textContent = `${rewardForMinutes(selectedMinutes, data.focusMinutesPerCredit)} break credits`;
   renderActivity();
+  renderDistractions();
+}
+
+function renderDistractions() {
+  elements.distractionList.replaceChildren();
+  elements.interventionDistraction.replaceChildren();
+  elements.urgeCount.textContent = data.interventions.length;
+
+  if (!data.distractions.length) {
+    const empty = document.createElement("p");
+    empty.className = "distraction-empty";
+    empty.textContent = "Your list is empty. Add one recurring distraction to begin.";
+    elements.distractionList.append(empty);
+  }
+
+  data.distractions.forEach((name, index) => {
+    const item = document.createElement("div");
+    item.className = "distraction-chip";
+    const label = document.createElement("span");
+    label.textContent = name;
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.setAttribute("aria-label", `Remove ${name}`);
+    remove.textContent = "×";
+    remove.addEventListener("click", () => {
+      data.distractions.splice(index, 1);
+      saveData();
+      renderDistractions();
+    });
+    item.append(label, remove);
+    elements.distractionList.append(item);
+
+    const option = document.createElement("option");
+    option.value = name;
+    option.textContent = name;
+    elements.interventionDistraction.append(option);
+  });
+
+  if (!data.distractions.length) {
+    const option = document.createElement("option");
+    option.value = "Something else";
+    option.textContent = "Something else";
+    elements.interventionDistraction.append(option);
+  }
 }
 
 function renderActivity() {
@@ -200,6 +261,21 @@ elements.settingsForm.addEventListener("submit", (event) => {
 });
 
 elements.endBreak.addEventListener("click", endBreak);
+elements.distractionForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const updated = addUniqueDistraction(data.distractions, elements.distractionInput.value);
+  if (updated === data.distractions) return;
+  data.distractions = updated;
+  elements.distractionInput.value = "";
+  saveData();
+  renderDistractions();
+});
+
+elements.interventionButton.addEventListener("click", startIntervention);
+elements.closeIntervention.addEventListener("click", closeIntervention);
+elements.interventionDialog.addEventListener("close", () => window.clearInterval(breathTimerId));
+elements.returnFocus.addEventListener("click", () => completeIntervention("returned"));
+elements.continueIntentionally.addEventListener("click", () => completeIntervention("continued"));
 
 function startBreak() {
   window.clearInterval(breakTimerId);
@@ -220,6 +296,40 @@ function renderBreakTimer() {
 function endBreak() {
   window.clearInterval(breakTimerId);
   if (elements.breakDialog.open) elements.breakDialog.close();
+}
+
+function startIntervention() {
+  window.clearInterval(breathTimerId);
+  breathSeconds = 5;
+  elements.breathCount.textContent = breathSeconds;
+  elements.interventionBreathe.hidden = false;
+  elements.interventionChoice.hidden = true;
+  elements.interventionDialog.showModal();
+  breathTimerId = window.setInterval(() => {
+    breathSeconds -= 1;
+    elements.breathCount.textContent = Math.max(0, breathSeconds);
+    if (breathSeconds <= 0) {
+      window.clearInterval(breathTimerId);
+      elements.interventionBreathe.hidden = true;
+      elements.interventionChoice.hidden = false;
+    }
+  }, 1000);
+}
+
+function completeIntervention(choice) {
+  data.interventions.push({
+    distraction: elements.interventionDistraction.value,
+    choice,
+    completedAt: new Date().toISOString()
+  });
+  saveData();
+  elements.urgeCount.textContent = data.interventions.length;
+  closeIntervention();
+}
+
+function closeIntervention() {
+  window.clearInterval(breathTimerId);
+  if (elements.interventionDialog.open) elements.interventionDialog.close();
 }
 
 renderTimer();

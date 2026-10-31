@@ -70,6 +70,7 @@
             <button id="start-button" class="primary-button" type="button"><span>Start focus</span><span aria-hidden="true">→</span></button>
           </div>
           <p class="reward-note">Complete this orbit to earn <strong id="reward-preview">5 break credits</strong></p>
+          <button id="intervention-button" class="pause-link" type="button" aria-haspopup="dialog">Feeling pulled away? Pause an urge</button>
         </div>
       </section>
 
@@ -90,6 +91,22 @@
           <div class="stat-icon violet">✦</div>
           <div><span>CURRENT STREAK</span><strong><span id="streak-count">0</span> days</strong><small id="streak-message">Begin your first orbit</small></div>
         </article>
+      </section>
+
+      <section class="distraction-section" aria-labelledby="distraction-heading">
+        <div class="distraction-copy">
+          <p class="eyebrow">GENTLE GUARDRAILS</p>
+          <h2 id="distraction-heading">Name the pull before it pulls you.</h2>
+          <p>Add the sites or apps that tend to interrupt your focus. Focus Orbit won’t hard-block them—it gives you a moment to choose intentionally.</p>
+          <div class="intervention-count"><strong id="urge-count">0</strong><span>intentional pauses taken</span></div>
+        </div>
+        <div class="distraction-panel">
+          <form id="distraction-form" class="distraction-form">
+            <label for="distraction-input">Add a distraction</label>
+            <div><input id="distraction-input" type="text" maxlength="40" placeholder="e.g. Instagram or news" autocomplete="off" required /><button type="submit">Add</button></div>
+          </form>
+          <div id="distraction-list" class="distraction-list" aria-live="polite"></div>
+        </div>
       </section>
 
       <section class="activity-section">
@@ -126,6 +143,27 @@
         </label>
         <button class="primary-button modal-save" value="default" type="submit"><span>Save preferences</span><span aria-hidden="true">→</span></button>
       </form>
+    </dialog>
+
+    <dialog id="intervention-dialog" class="modal-card intervention-modal">
+      <button id="close-intervention-button" class="close-button intervention-close" type="button" aria-label="Close pause">×</button>
+      <div id="intervention-breathe" class="intervention-step">
+        <div class="breath-orbit" aria-hidden="true"><span id="breath-count">5</span></div>
+        <p class="card-label">MAKE SPACE FOR A CHOICE</p>
+        <h2>Take one slow breath.</h2>
+        <p>The urge can be here without deciding what happens next.</p>
+      </div>
+      <div id="intervention-choice" class="intervention-step" hidden>
+        <div class="break-icon" aria-hidden="true">✦</div>
+        <p class="card-label">CHOOSE INTENTIONALLY</p>
+        <h2>What do you want to do?</h2>
+        <label class="intervention-select-label" for="intervention-distraction">I was about to check</label>
+        <select id="intervention-distraction"></select>
+        <div class="choice-actions">
+          <button id="return-focus-button" class="primary-button" type="button"><span>Return to focus</span><span aria-hidden="true">→</span></button>
+          <button id="continue-button" class="secondary-button" type="button">Continue intentionally</button>
+        </div>
+      </div>
     </dialog>
 
     <dialog id="break-dialog" class="modal-card break-modal">

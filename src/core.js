@@ -10,6 +10,14 @@ export const spendCredits = (credits, cost) => {
   return credits - cost;
 };
 
+export const normalizeDistractionName = (value) => value.trim().replace(/\s+/g, " ").slice(0, 40);
+
+export const addUniqueDistraction = (items, value) => {
+  const name = normalizeDistractionName(value);
+  if (!name || items.some((item) => item.toLowerCase() === name.toLowerCase())) return items;
+  return [...items, name];
+};
+
 export const formatTime = (seconds) => {
   const safeSeconds = Math.max(0, Math.floor(seconds));
   const minutes = Math.floor(safeSeconds / 60);

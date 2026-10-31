@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { calculateStreak, canSpendCredits, formatTime, progressRatio, rewardForMinutes, spendCredits } from "../src/core.js";
+import { addUniqueDistraction, calculateStreak, canSpendCredits, formatTime, normalizeDistractionName, progressRatio, rewardForMinutes, spendCredits } from "../src/core.js";
 
 test("formats countdown values", () => {
   assert.equal(formatTime(1500), "25:00");
@@ -20,6 +20,14 @@ test("spends credits only when the full break is affordable", () => {
   assert.equal(canSpendCredits(4, 5), false);
   assert.equal(spendCredits(10, 5), 5);
   assert.equal(spendCredits(4, 5), 4);
+});
+
+test("normalizes and deduplicates distraction names", () => {
+  assert.equal(normalizeDistractionName("  Social   media  "), "Social media");
+  assert.deepEqual(addUniqueDistraction([], "Reddit"), ["Reddit"]);
+  const existing = ["Reddit"];
+  assert.equal(addUniqueDistraction(existing, " reddit "), existing);
+  assert.equal(addUniqueDistraction(existing, "   "), existing);
 });
 
 test("clamps timer progress", () => {
