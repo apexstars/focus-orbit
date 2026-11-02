@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { addUniqueDistraction, calculateStreak, canSpendCredits, formatTime, normalizeDistractionName, progressRatio, rewardForMinutes, spendCredits } from "../src/core.js";
+import { addUniqueDistraction, calculateStreak, canSpendCredits, formatTime, normalizeDistractionName, progressRatio, rewardForMinutes, spendCredits, weeklyInsight } from "../src/core.js";
 
 test("formats countdown values", () => {
   assert.equal(formatTime(1500), "25:00");
@@ -40,4 +40,18 @@ test("counts a consecutive daily streak", () => {
   const today = new Date("2026-10-29T12:00:00Z");
   const dates = ["2026-10-27T09:00:00Z", "2026-10-28T09:00:00Z", "2026-10-29T09:00:00Z"];
   assert.equal(calculateStreak(dates, today), 3);
+});
+
+test("summarizes the last seven days without including older sessions", () => {
+  const today = new Date("2026-10-29T12:00:00Z");
+  const sessions = [
+    { minutes: 25, completedAt: "2026-10-29T09:00:00Z" },
+    { minutes: 45, completedAt: "2026-10-27T09:00:00Z" },
+    { minutes: 60, completedAt: "2026-10-21T09:00:00Z" }
+  ];
+  const summary = weeklyInsight(sessions, today);
+  assert.equal(summary.days.length, 7);
+  assert.equal(summary.totalMinutes, 70);
+  assert.equal(summary.totalSessions, 2);
+  assert.deepEqual(summary.bestDay, { date: "2026-10-27", minutes: 45, sessions: 1 });
 });

@@ -42,3 +42,36 @@ export const calculateStreak = (sessionDates, today = new Date()) => {
   }
   return streak;
 };
+
+const dayKey = (date) => new Date(date).toISOString().slice(0, 10);
+
+export const weeklyFocus = (sessions, today = new Date(), days = 7) => {
+  const safeDays = Math.max(1, Math.floor(days));
+  const end = new Date(today);
+  end.setUTCHours(0, 0, 0, 0);
+  const totals = new Map();
+
+  for (let offset = safeDays - 1; offset >= 0; offset -= 1) {
+    const date = new Date(end);
+    date.setUTCDate(date.getUTCDate() - offset);
+    totals.set(dayKey(date), { date: dayKey(date), minutes: 0, sessions: 0 });
+  }
+
+  sessions.forEach((session) => {
+    const key = dayKey(session.completedAt);
+    const entry = totals.get(key);
+    if (!entry) return;
+    entry.minutes += Math.max(0, Number(session.minutes) || 0);
+    entry.sessions += 1;
+  });
+
+  return [...totals.values()];
+};
+
+export const weeklyInsight = (sessions, today = new Date()) => {
+  const days = weeklyFocus(sessions, today);
+  const totalMinutes = days.reduce((total, day) => total + day.minutes, 0);
+  const totalSessions = days.reduce((total, day) => total + day.sessions, 0);
+  const bestDay = days.reduce((best, day) => day.minutes > best.minutes ? day : best, days[0]);
+  return { days, totalMinutes, totalSessions, bestDay };
+};

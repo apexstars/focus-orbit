@@ -91,6 +91,17 @@ h1 em::after { content: ""; position: absolute; left: 4px; right: -2px; bottom: 
 .goal-progress span { display: block; width: 0; height: 100%; background: var(--green); transition: width .3s ease; }
 
 .activity-section { padding: 0 0 80px; }
+.insight-section { padding: 0 0 72px; }
+.insight-card { display: grid; grid-template-columns: .9fr 1.1fr; gap: 30px; align-items: stretch; padding: 28px; border: 1px solid rgba(25,95,72,.12); border-radius: 22px; background: rgba(255,255,255,.55); }
+.weekly-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.weekly-metrics div { display: grid; align-content: start; gap: 4px; }
+.weekly-metrics span { color: var(--muted); font-size: 8px; letter-spacing: .13em; font-weight: 700; }
+.weekly-metrics strong { font-family: "Space Grotesk", sans-serif; color: var(--green); font-size: 23px; letter-spacing: -.03em; }
+.weekly-metrics small { color: var(--muted); font-size: 10px; line-height: 1.35; }
+.weekly-chart { height: 130px; display: grid; grid-template-columns: repeat(7, 1fr); align-items: end; gap: 9px; padding: 0 4px; border-bottom: 1px solid var(--line); }
+.chart-day { height: 100%; display: grid; grid-template-rows: 1fr auto; align-items: end; gap: 7px; text-align: center; }
+.chart-bar { min-height: 3px; width: 100%; border-radius: 8px 8px 2px 2px; background: linear-gradient(180deg, var(--lime), var(--green)); transition: height .3s ease; }
+.chart-day span { color: var(--muted); font-size: 10px; font-weight: 700; }
 .distraction-section { display: grid; grid-template-columns: .9fr 1.1fr; gap: 70px; align-items: center; margin-bottom: 72px; padding: 48px; border-radius: 28px; background: rgba(25,95,72,.07); border: 1px solid rgba(25,95,72,.08); }
 .distraction-copy h2 { max-width: 480px; margin: 0; font-size: 36px; line-height: 1.05; letter-spacing: -.04em; }
 .distraction-copy > p:not(.eyebrow) { max-width: 490px; color: var(--muted); line-height: 1.6; font-size: 14px; }
@@ -156,6 +167,7 @@ h1 em::after { content: ""; position: absolute; left: 4px; right: -2px; bottom: 
   .timer-card { width: min(480px, 100%); margin-inline: auto; }
   .dashboard { grid-template-columns: 1fr; }
   .distraction-section { grid-template-columns: 1fr; gap: 30px; }
+  .insight-card { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 540px) {
@@ -173,6 +185,9 @@ h1 em::after { content: ""; position: absolute; left: 4px; right: -2px; bottom: 
   .field-row { align-items: flex-start; flex-direction: column; gap: 10px; }
   .field-row input, .field-row select { width: 100%; }
   .distraction-section { padding: 28px 20px; }
+  .insight-card { padding: 22px 17px; }
+  .weekly-metrics { gap: 9px; }
+  .weekly-metrics strong { font-size: 19px; }
   .distraction-copy h2 { font-size: 30px; }
 }
 
