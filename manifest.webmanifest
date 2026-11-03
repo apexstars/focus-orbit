@@ -1,0 +1,10 @@
+{
+  "name": "Focus Orbit",
+  "short_name": "Focus Orbit",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f4ec",
+  "theme_color": "#195f48",
+  "icons": [{ "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

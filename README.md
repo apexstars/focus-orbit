@@ -6,7 +6,7 @@ Focus Orbit is a privacy-first focus timer that turns intentional work into earn
 
 Product Hunt's October 28, 2026 leaderboard showed strong demand for tools that reduce doomscrolling and reward intentional app use. Focus Orbit explores the same market need as an original, open-source browser experience with local-only data.
 
-## Features through Day 3
+## Features through Day 5
 
 - Configurable focus sessions
 - Live timer with pause and reset controls
@@ -20,6 +20,12 @@ Product Hunt's October 28, 2026 leaderboard showed strong demand for tools that 
 - Personal distraction list stored only on-device
 - Five-second breathing pause before an intentional choice
 - Local intervention history with return-to-focus tracking
+- Weekly focus chart, totals, and strongest day
+- Web app manifest and cached app shell for offline use
+
+## Offline use
+
+Open the app once while online to cache its files. Subsequent visits work offline on the same browser. Installation is available through supporting browsers on HTTPS (or localhost); browser support varies. Fonts fall back to the system sans-serif when unavailable. Your focus data remains in this browser's local storage.
 
 ## Run locally
 
@@ -40,8 +46,8 @@ npm test
 1. Core timer, credits, goals, and local persistence
 2. ✅ Break-spending flow and customizable reward rules
 3. ✅ Distraction list and gentle intervention screen
-4. Weekly insights and activity charts
-5. Installable PWA and offline support
+4. ✅ Weekly insights and activity charts
+5. ✅ PWA manifest and offline app shell
 6. Focus presets and keyboard shortcuts
 7. Import/export and privacy controls
 8. Accessibility and mobile interaction pass

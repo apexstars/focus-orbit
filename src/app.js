@@ -364,3 +364,9 @@ function closeIntervention() {
 
 renderTimer();
 renderDashboard();
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./sw.js").catch((error) => {
+    console.warn("Offline support could not be enabled", error);
+  });
+}
