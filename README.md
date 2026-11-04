@@ -22,6 +22,7 @@ Product Hunt's October 28, 2026 leaderboard showed strong demand for tools that 
 - Local intervention history with return-to-focus tracking
 - Weekly focus chart, totals, and strongest day
 - Web app manifest and cached app shell for offline use
+- Keyboard shortcuts: Space starts or pauses focus; R resets the timer (outside forms and dialogs)
 
 ## Offline use
 

@@ -253,6 +253,18 @@ elements.duration.addEventListener("change", () => {
 
 elements.start.addEventListener("click", toggleTimer);
 elements.reset.addEventListener("click", resetTimer);
+document.addEventListener("keydown", (event) => {
+  if (event.repeat || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+  if (document.querySelector("dialog[open]")) return;
+  if (event.target.closest("input, select, textarea, button, a, [contenteditable]")) return;
+  if (event.code === "Space") {
+    event.preventDefault();
+    toggleTimer();
+  } else if (event.key.toLowerCase() === "r") {
+    event.preventDefault();
+    resetTimer();
+  }
+});
 elements.spend.addEventListener("click", () => {
   if (!canSpendCredits(data.credits, data.breakLength)) return;
   data.credits = spendCredits(data.credits, data.breakLength);
