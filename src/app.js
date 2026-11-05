@@ -66,6 +66,7 @@ let totalSeconds = selectedMinutes * 60;
 let remainingSeconds = totalSeconds;
 let timerId = null;
 let running = false;
+let focusDeadline = null;
 let breakTimerId = null;
 let breakSeconds = data.breakLength * 60;
 let breathTimerId = null;
@@ -211,20 +212,25 @@ function renderActivity() {
 function toggleTimer() {
   running = !running;
   if (running) {
+    focusDeadline = Date.now() + remainingSeconds * 1000;
     timerId = window.setInterval(tick, 1000);
   } else {
+    remainingSeconds = Math.max(0, Math.ceil((focusDeadline - Date.now()) / 1000));
+    focusDeadline = null;
     window.clearInterval(timerId);
+    if (remainingSeconds === 0) completeSession();
   }
   renderTimer();
 }
 
 function tick() {
-  remainingSeconds -= 1;
+  remainingSeconds = Math.max(0, Math.ceil((focusDeadline - Date.now()) / 1000));
   if (remainingSeconds <= 0) completeSession();
   renderTimer();
 }
 
 function completeSession() {
+  focusDeadline = null;
   window.clearInterval(timerId);
   running = false;
   const reward = rewardForMinutes(selectedMinutes, data.focusMinutesPerCredit);
@@ -238,6 +244,7 @@ function completeSession() {
 }
 
 function resetTimer() {
+  focusDeadline = null;
   window.clearInterval(timerId);
   running = false;
   remainingSeconds = totalSeconds;
@@ -320,12 +327,14 @@ elements.returnFocus.addEventListener("click", () => completeIntervention("retur
 elements.continueIntentionally.addEventListener("click", () => completeIntervention("continued"));
 
 function startBreak() {
+  if (running) toggleTimer();
   window.clearInterval(breakTimerId);
   breakSeconds = data.breakLength * 60;
   renderBreakTimer();
   elements.breakDialog.showModal();
+  const breakDeadline = Date.now() + breakSeconds * 1000;
   breakTimerId = window.setInterval(() => {
-    breakSeconds -= 1;
+    breakSeconds = Math.max(0, Math.ceil((breakDeadline - Date.now()) / 1000));
     renderBreakTimer();
     if (breakSeconds <= 0) endBreak();
   }, 1000);
