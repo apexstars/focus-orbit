@@ -61,6 +61,9 @@ const defaultData = {
   sessions: []
 };
 let data = loadData();
+if (Array.from(elements.duration.options).some((option) => option.value === String(data.focusDuration))) {
+  elements.duration.value = String(data.focusDuration);
+}
 let selectedMinutes = Number(elements.duration.value);
 let totalSeconds = selectedMinutes * 60;
 let remainingSeconds = totalSeconds;
@@ -253,6 +256,8 @@ function resetTimer() {
 
 elements.duration.addEventListener("change", () => {
   selectedMinutes = Number(elements.duration.value);
+  data.focusDuration = selectedMinutes;
+  saveData();
   totalSeconds = selectedMinutes * 60;
   resetTimer();
   renderDashboard();
