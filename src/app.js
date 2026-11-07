@@ -1,4 +1,4 @@
-import { addUniqueDistraction, calculateStreak, canSpendCredits, formatTime, progressRatio, rewardForMinutes, spendCredits, weeklyInsight } from "./core.js";
+import { addUniqueDistraction, calculateStreak, canSpendCredits, formatTime, parseBackup, progressRatio, rewardForMinutes, spendCredits, weeklyInsight } from "./core.js";
 
 const STORAGE_KEY = "focus-orbit-v1";
 const ringCircumference = 2 * Math.PI * 96;
@@ -312,6 +312,50 @@ elements.settingsForm.addEventListener("submit", (event) => {
   saveData();
   renderDashboard();
   elements.settingsDialog.close();
+});
+
+const backupFile = document.querySelector("#backup-file");
+const backupStatus = document.querySelector("#backup-status");
+const restoreButton = document.querySelector("#import-backup");
+
+document.querySelector("#export-backup").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify({ version: 1, data }, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "focus-orbit-backup.json";
+  link.click();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+
+restoreButton.addEventListener("click", async () => {
+  const file = backupFile.files[0];
+  if (!file) {
+    backupStatus.textContent = "Select a Focus Orbit backup first.";
+    return;
+  }
+  restoreButton.disabled = true;
+  try {
+    const restored = parseBackup(await file.text());
+    if (!elements.settingsDialog.open) return;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(restored));
+    data = restored;
+    elements.duration.value = String(data.focusDuration ?? 25);
+    selectedMinutes = Number(elements.duration.value);
+    totalSeconds = selectedMinutes * 60;
+    resetTimer();
+    endBreak();
+    renderDashboard();
+    elements.focusPerCredit.value = data.focusMinutesPerCredit;
+    elements.breakLength.value = data.breakLength;
+    elements.dailyGoal.value = data.dailyGoal;
+    backupFile.value = "";
+    backupStatus.textContent = "Backup restored.";
+  } catch {
+    backupStatus.textContent = "Could not restore this backup. Check the file and available browser storage.";
+  } finally {
+    restoreButton.disabled = false;
+  }
 });
 
 elements.endBreak.addEventListener("click", endBreak);

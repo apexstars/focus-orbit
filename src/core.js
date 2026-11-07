@@ -1,3 +1,26 @@
+export function parseBackup(text) {
+  const { version, data } = JSON.parse(text) ?? {};
+  const whole = (value, min = 0, max = Number.MAX_SAFE_INTEGER) =>
+    Number.isSafeInteger(value) && value >= min && value <= max;
+  const date = (value) => typeof value === "string" && Number.isFinite(Date.parse(value)) &&
+    new Date(value).toISOString() === value;
+  const name = (value) => typeof value === "string" && value.trim().length > 0 && value.length <= 40;
+  if (version !== 1 || !data || !whole(data.credits) || !whole(data.totalEarned, data.credits) ||
+      !whole(data.dailyGoal, 1, 12) || !whole(data.focusMinutesPerCredit, 1, 30) ||
+      ![5, 10, 15].includes(data.breakLength) ||
+      (data.focusDuration !== undefined && ![15, 25, 45, 60].includes(data.focusDuration)) ||
+      !Array.isArray(data.distractions) || !data.distractions.every(name) ||
+      !Array.isArray(data.sessions) || !data.sessions.every((session) =>
+        session && whole(session.minutes, 1, 60) && whole(session.reward, 1, 60) && date(session.completedAt)) ||
+      !Array.isArray(data.interventions) || !data.interventions.every((entry) =>
+        entry && name(entry.distraction) && ["returned", "continued"].includes(entry.choice) && date(entry.completedAt))) {
+    throw new Error("Invalid Focus Orbit backup");
+  }
+
+  const { credits, totalEarned, dailyGoal, focusMinutesPerCredit, breakLength, focusDuration, distractions, sessions, interventions } = data;
+  return { credits, totalEarned, dailyGoal, focusMinutesPerCredit, breakLength, focusDuration, distractions, sessions, interventions };
+}
+
 export const rewardForMinutes = (minutes, focusMinutesPerCredit = 5) => {
   const rate = Math.max(1, Number(focusMinutesPerCredit) || 5);
   return Math.max(1, Math.round(minutes / rate));

@@ -161,6 +161,15 @@
         </label>
         <button class="primary-button modal-save" value="default" type="submit"><span>Save preferences</span><span aria-hidden="true">→</span></button>
       </form>
+      <section aria-labelledby="backup-heading">
+        <h3 id="backup-heading">Local backup</h3>
+        <p class="modal-intro">Backups include your preferences, credits, and activity. Restoring replaces the data in this browser and resets the timer.</p>
+        <button id="export-backup" class="settings-button" type="button">Download backup</button>
+        <p><label for="backup-file">Select a backup file</label></p>
+        <input id="backup-file" type="file" accept=".json,application/json" />
+        <button id="import-backup" class="settings-button" type="button">Restore backup</button>
+        <p id="backup-status" role="status"></p>
+      </section>
     </dialog>
 
     <dialog id="intervention-dialog" class="modal-card intervention-modal">

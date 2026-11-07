@@ -23,6 +23,7 @@ Product Hunt's October 28, 2026 leaderboard showed strong demand for tools that 
 - Weekly focus chart, totals, and strongest day
 - Web app manifest and cached app shell for offline use
 - Keyboard shortcuts: Space starts or pauses focus; R resets the timer (outside forms and dialogs)
+- Local JSON backup and restore in Preferences. Restoring replaces the current browser's saved data.
 
 ## Offline use
 
@@ -50,7 +51,7 @@ npm test
 4. ✅ Weekly insights and activity charts
 5. ✅ PWA manifest and offline app shell
 6. Focus presets and keyboard shortcuts
-7. Import/export and privacy controls
+7. ✅ Local backup export and restore
 8. Accessibility and mobile interaction pass
 9. Automated tests, performance, and polish
 10. Release documentation, demo, and v1.0 launch
