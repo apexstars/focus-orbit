@@ -136,10 +136,10 @@
       </section>
     </main>
 
-    <dialog id="settings-dialog" class="modal-card">
+    <dialog id="settings-dialog" class="modal-card" aria-labelledby="settings-title">
       <form id="settings-form" method="dialog">
         <div class="modal-heading">
-          <div><p class="card-label">YOUR RHYTHM</p><h2>Reward preferences</h2></div>
+          <div><p class="card-label">YOUR RHYTHM</p><h2 id="settings-title">Reward preferences</h2></div>
           <button class="close-button" value="cancel" formnovalidate aria-label="Close preferences">×</button>
         </div>
         <p class="modal-intro">Choose a reward loop that feels motivating without letting breaks take over.</p>
@@ -172,7 +172,7 @@
       </section>
     </dialog>
 
-    <dialog id="intervention-dialog" class="modal-card intervention-modal">
+    <dialog id="intervention-dialog" class="modal-card intervention-modal" aria-label="Pause an urge">
       <button id="close-intervention-button" class="close-button intervention-close" type="button" aria-label="Close pause">×</button>
       <div id="intervention-breathe" class="intervention-step">
         <div class="breath-orbit" aria-hidden="true"><span id="breath-count">5</span></div>
@@ -193,10 +193,10 @@
       </div>
     </dialog>
 
-    <dialog id="break-dialog" class="modal-card break-modal">
+    <dialog id="break-dialog" class="modal-card break-modal" aria-labelledby="break-title">
       <div class="break-icon" aria-hidden="true">☼</div>
       <p class="card-label">BREAK ORBIT</p>
-      <h2>Step away. You earned it.</h2>
+      <h2 id="break-title">Step away. You earned it.</h2>
       <div id="break-timer" class="break-timer">05:00</div>
       <p>Stretch, breathe, or get some water. Your next focus orbit will be waiting.</p>
       <button id="end-break-button" class="primary-button" type="button"><span>End break</span><span aria-hidden="true">→</span></button>

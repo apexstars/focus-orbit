@@ -128,9 +128,11 @@ function renderWeeklyInsight() {
   elements.weeklyMinutes.textContent = `${summary.totalMinutes} min`;
   elements.weeklySessions.textContent = summary.totalSessions;
   elements.bestDay.textContent = summary.bestDay.minutes
-    ? new Date(`${summary.bestDay.date}T12:00:00Z`).toLocaleDateString(undefined, { weekday: "long" })
+    ? chartWeekday(summary.bestDay.date, "long")
     : "—";
   elements.weeklyChart.replaceChildren();
+  const dayTotals = summary.days.map((day) => `${chartWeekday(day.date, "long")}: ${day.minutes}`);
+  elements.weeklyChart.setAttribute("aria-label", `Focused minutes over the last seven days. ${dayTotals.join(", ")}.`);
 
   summary.days.forEach((day) => {
     const item = document.createElement("div");
@@ -139,12 +141,15 @@ function renderWeeklyInsight() {
     bar.className = "chart-bar";
     bar.style.height = `${day.minutes ? Math.max(8, (day.minutes / highestMinutes) * 100) : 3}%`;
     bar.title = `${day.minutes} focused minute${day.minutes === 1 ? "" : "s"}`;
-    bar.setAttribute("aria-label", `${new Date(`${day.date}T12:00:00Z`).toLocaleDateString(undefined, { weekday: "long" })}: ${day.minutes} focused minutes`);
     const label = document.createElement("span");
-    label.textContent = new Date(`${day.date}T12:00:00Z`).toLocaleDateString(undefined, { weekday: "narrow" });
+    label.textContent = chartWeekday(day.date, "narrow");
     item.append(bar, label);
     elements.weeklyChart.append(item);
   });
+}
+
+function chartWeekday(date, weekday) {
+  return new Date(date).toLocaleDateString(undefined, { weekday, timeZone: "UTC" });
 }
 
 function renderDistractions() {
@@ -412,6 +417,7 @@ function startIntervention() {
       window.clearInterval(breathTimerId);
       elements.interventionBreathe.hidden = true;
       elements.interventionChoice.hidden = false;
+      elements.interventionDistraction.focus();
     }
   }, 1000);
 }
