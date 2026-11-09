@@ -1,4 +1,4 @@
-import { addUniqueDistraction, calculateStreak, canSpendCredits, formatTime, parseBackup, progressRatio, rewardForMinutes, spendCredits, weeklyInsight } from "./core.js";
+import { addUniqueDistraction, calculateStreak, canSpendCredits, formatTime, localDayKey, parseBackup, progressRatio, rewardForMinutes, spendCredits, weeklyInsight } from "./core.js";
 
 const STORAGE_KEY = "focus-orbit-v1";
 const ringCircumference = 2 * Math.PI * 96;
@@ -87,12 +87,9 @@ function saveData() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
-function todayKey() {
-  return new Date().toISOString().slice(0, 10);
-}
-
 function todaySessions() {
-  return data.sessions.filter((session) => session.completedAt.slice(0, 10) === todayKey());
+  const today = localDayKey(new Date());
+  return data.sessions.filter((session) => localDayKey(session.completedAt) === today);
 }
 
 function renderTimer() {
@@ -226,7 +223,10 @@ function toggleTimer() {
     remainingSeconds = Math.max(0, Math.ceil((focusDeadline - Date.now()) / 1000));
     focusDeadline = null;
     window.clearInterval(timerId);
-    if (remainingSeconds === 0) completeSession();
+    if (remainingSeconds === 0) {
+      completeSession();
+      return;
+    }
   }
   renderTimer();
 }
@@ -234,7 +234,7 @@ function toggleTimer() {
 function tick() {
   remainingSeconds = Math.max(0, Math.ceil((focusDeadline - Date.now()) / 1000));
   if (remainingSeconds <= 0) completeSession();
-  renderTimer();
+  else renderTimer();
 }
 
 function completeSession() {
@@ -247,6 +247,7 @@ function completeSession() {
   data.sessions.push({ minutes: selectedMinutes, reward, completedAt: new Date().toISOString() });
   saveData();
   remainingSeconds = totalSeconds;
+  renderTimer();
   elements.status.textContent = "ORBIT COMPLETE";
   renderDashboard();
 }

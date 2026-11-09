@@ -37,17 +37,17 @@ test("clamps timer progress", () => {
 });
 
 test("counts a consecutive daily streak", () => {
-  const today = new Date("2026-10-29T12:00:00Z");
-  const dates = ["2026-10-27T09:00:00Z", "2026-10-28T09:00:00Z", "2026-10-29T09:00:00Z"];
+  const today = new Date("2026-10-29T12:00:00");
+  const dates = ["2026-10-27T09:00:00", "2026-10-28T09:00:00", "2026-10-29T09:00:00"];
   assert.equal(calculateStreak(dates, today), 3);
 });
 
 test("summarizes the last seven days without including older sessions", () => {
-  const today = new Date("2026-10-29T12:00:00Z");
+  const today = new Date("2026-10-29T12:00:00");
   const sessions = [
-    { minutes: 25, completedAt: "2026-10-29T09:00:00Z" },
-    { minutes: 45, completedAt: "2026-10-27T09:00:00Z" },
-    { minutes: 60, completedAt: "2026-10-21T09:00:00Z" }
+    { minutes: 25, completedAt: new Date("2026-10-29T23:50:00").toISOString() },
+    { minutes: 45, completedAt: new Date("2026-10-27T23:50:00").toISOString() },
+    { minutes: 60, completedAt: new Date("2026-10-22T23:50:00").toISOString() }
   ];
   const summary = weeklyInsight(sessions, today);
   assert.equal(summary.days.length, 7);

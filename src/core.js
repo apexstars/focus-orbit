@@ -53,35 +53,42 @@ export const progressRatio = (remaining, total) => {
   return Math.min(1, Math.max(0, (total - remaining) / total));
 };
 
+export function localDayKey(value) {
+  const date = new Date(value);
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
 export const calculateStreak = (sessionDates, today = new Date()) => {
-  const days = new Set(sessionDates.map((date) => new Date(date).toISOString().slice(0, 10)));
+  const days = new Set(sessionDates.map(localDayKey));
   let streak = 0;
   const cursor = new Date(today);
-  cursor.setUTCHours(0, 0, 0, 0);
+  if (!Number.isFinite(cursor.getTime())) return 0;
+  cursor.setHours(12, 0, 0, 0);
 
-  while (days.has(cursor.toISOString().slice(0, 10))) {
+  while (days.has(localDayKey(cursor))) {
     streak += 1;
-    cursor.setUTCDate(cursor.getUTCDate() - 1);
+    cursor.setDate(cursor.getDate() - 1);
   }
   return streak;
 };
 
-const dayKey = (date) => new Date(date).toISOString().slice(0, 10);
-
 export const weeklyFocus = (sessions, today = new Date(), days = 7) => {
   const safeDays = Math.max(1, Math.floor(days));
   const end = new Date(today);
-  end.setUTCHours(0, 0, 0, 0);
+  end.setHours(12, 0, 0, 0);
   const totals = new Map();
 
   for (let offset = safeDays - 1; offset >= 0; offset -= 1) {
     const date = new Date(end);
-    date.setUTCDate(date.getUTCDate() - offset);
-    totals.set(dayKey(date), { date: dayKey(date), minutes: 0, sessions: 0 });
+    date.setDate(date.getDate() - offset);
+    const key = localDayKey(date);
+    totals.set(key, { date: key, minutes: 0, sessions: 0 });
   }
 
   sessions.forEach((session) => {
-    const key = dayKey(session.completedAt);
+    const key = localDayKey(session.completedAt);
     const entry = totals.get(key);
     if (!entry) return;
     entry.minutes += Math.max(0, Number(session.minutes) || 0);
