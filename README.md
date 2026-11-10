@@ -6,9 +6,9 @@ Focus Orbit is a privacy-first focus timer that turns intentional work into earn
 
 Product Hunt's October 28, 2026 leaderboard showed strong demand for tools that reduce doomscrolling and reward intentional app use. Focus Orbit explores the same market need as an original, open-source browser experience with local-only data.
 
-## Features through Day 5
+## Features
 
-- Configurable focus sessions
+- Four focus presets, with the last selection remembered
 - Live timer with pause and reset controls
 - Break credits earned from completed sessions
 - Daily goals and streak tracking
@@ -31,6 +31,8 @@ Open the app once while online to cache its files. Subsequent visits work offlin
 
 ## Run locally
 
+You’ll need Node.js 22 or newer and Python 3. There are no npm dependencies to install.
+
 ```bash
 npm start
 ```
@@ -43,18 +45,18 @@ Open `http://localhost:4173`.
 npm test
 ```
 
-## Ten-day build plan
+## Try the focus-to-break loop
 
-1. Core timer, credits, goals, and local persistence
-2. ✅ Break-spending flow and customizable reward rules
-3. ✅ Distraction list and gentle intervention screen
-4. ✅ Weekly insights and activity charts
-5. ✅ PWA manifest and offline app shell
-6. Focus presets and keyboard shortcuts
-7. ✅ Local backup export and restore
-8. Accessibility and mobile interaction pass
-9. Automated tests, performance, and polish
-10. Release documentation, demo, and v1.0 launch
+1. In Preferences, set **Focus per credit** to 3 and keep the break length at 5 minutes.
+2. Choose **Quick start · 15 min** and finish the session. The app should log the orbit, update your weekly totals, and add 5 break credits.
+3. Select **Take a 5 min break**. The app should deduct 5 credits and open the break countdown. Reload after ending the break to check that your session and remaining balance were saved.
+
+## Release checks
+
+- [ ] Run the focus-to-break loop in Chrome and Safari.
+- [ ] Verify backup download and restore using disposable browser data.
+- [ ] Check keyboard focus and chart announcements with a screen reader, and check the layout on a narrow viewport.
+- [ ] Confirm installation and offline reload from the final HTTPS deployment.
 
 ## License
 
