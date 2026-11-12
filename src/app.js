@@ -365,6 +365,7 @@ restoreButton.addEventListener("click", async () => {
 });
 
 elements.endBreak.addEventListener("click", endBreak);
+elements.breakDialog.addEventListener("close", () => window.clearInterval(breakTimerId));
 elements.distractionForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const updated = addUniqueDistraction(data.distractions, elements.distractionInput.value);

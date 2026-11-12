@@ -15,7 +15,8 @@ async function createApp() {
         addEventListener(type, callback) { this.listeners[type] = callback; },
         querySelector() { return element(selector + " span"); },
         replaceChildren() {}, append() {}, setAttribute() {},
-        showModal() { this.open = true; }, close() { this.open = false; },
+        showModal() { this.open = true; },
+        close() { this.open = false; this.listeners.close?.(); },
         content: { cloneNode() { return {}; } }
       });
     }
@@ -49,7 +50,8 @@ async function createApp() {
       now += milliseconds;
       for (const callback of [...intervals.values()]) callback();
     },
-    saved() { return saved; }
+    saved() { return saved; },
+    activeIntervals() { return intervals.size; }
   };
 }
 
@@ -67,6 +69,25 @@ test("a delayed focus tick earns one reward and keeps the completion message", a
   assert.equal(app.element("#break-dialog").open, true);
   app.advance(5 * 60 * 1000);
   assert.equal(app.element("#break-dialog").open, false);
+});
+
+test("dismissing a break clears its timer and preserves the spent balance", async () => {
+  const app = await createApp();
+  app.click("#start-button");
+  app.advance(25 * 60 * 1000);
+  app.click("#spend-button");
+  assert.equal(app.activeIntervals(), 1);
+  app.element("#break-dialog").close();
+  assert.equal(app.activeIntervals(), 0);
+  assert.equal(app.saved().credits, 0);
+});
+
+test("an unaffordable break does not open or change storage", async () => {
+  const app = await createApp();
+  app.click("#spend-button");
+  assert.equal(app.element("#break-dialog").open, false);
+  assert.equal(app.saved(), null);
+  assert.equal(app.activeIntervals(), 0);
 });
 
 test("focus stays paused during an earned break", async () => {
