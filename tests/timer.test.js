@@ -45,7 +45,7 @@ async function createApp() {
   vm.runInContext(source.replace(/^import .*;\n/, ""), context);
   return {
     element,
-    click(selector) { element(selector).listeners.click(); },
+    click(selector) { return element(selector).listeners.click(); },
     advance(milliseconds) {
       now += milliseconds;
       for (const callback of [...intervals.values()]) callback();
@@ -101,4 +101,40 @@ test("focus stays paused during an earned break", async () => {
   app.advance(5 * 60 * 1000);
   assert.equal(app.element("#timer-value").textContent, pausedTime);
   assert.equal(app.element("#timer-status").textContent, "ORBIT PAUSED");
+});
+
+test("restore replaces saved data, selects its preset, and stops active focus", async () => {
+  const app = await createApp();
+  app.click("#start-button");
+  app.advance(10 * 1000);
+  app.click("#settings-button");
+  const restored = {
+    credits: 10, totalEarned: 10, dailyGoal: 4,
+    focusMinutesPerCredit: 3, breakLength: 10, focusDuration: 45,
+    distractions: [], sessions: [], interventions: []
+  };
+  app.element("#backup-file").files = [{
+    text: async () => JSON.stringify({ version: 1, data: restored })
+  }];
+  await app.click("#import-backup");
+  assert.deepEqual(app.saved(), restored);
+  assert.equal(app.element("#duration-select").value, "45");
+  assert.equal(app.element("#timer-value").textContent, "45:00");
+  assert.equal(app.element("#credit-count").textContent, 10);
+  assert.equal(app.activeIntervals(), 0);
+  assert.equal(app.element("#backup-status").textContent, "Backup restored.");
+});
+
+test("invalid restore preserves the balance and active timer", async () => {
+  const app = await createApp();
+  app.click("#start-button");
+  app.advance(25 * 60 * 1000);
+  const saved = app.saved();
+  app.click("#start-button");
+  app.click("#settings-button");
+  app.element("#backup-file").files = [{ text: async () => "{invalid" }];
+  await app.click("#import-backup");
+  assert.deepEqual(app.saved(), saved);
+  assert.equal(app.activeIntervals(), 1);
+  assert.equal(app.element("#import-backup").disabled, false);
 });
