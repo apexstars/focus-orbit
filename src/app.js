@@ -84,7 +84,14 @@ function loadData() {
 }
 
 function saveData() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  const status = document.querySelector("#storage-status");
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    status.hidden = true;
+  } catch {
+    status.textContent = "Your progress is available for this visit, but could not be saved. Download a backup in Preferences before closing this page.";
+    status.hidden = false;
+  }
 }
 
 function todaySessions() {

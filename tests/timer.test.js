@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 import vm from "node:vm";
 import * as core from "../src/core.js";
 
-async function createApp() {
+async function createApp({ storageFails = false } = {}) {
   const elements = new Map();
   function element(selector) {
     if (!elements.has(selector)) {
@@ -31,7 +31,10 @@ async function createApp() {
     Date: class extends Date { static now() { return now; } },
     localStorage: {
       getItem() { return null; },
-      setItem(key, value) { saved = JSON.parse(value); }
+      setItem(key, value) {
+        if (storageFails) throw new Error("Storage unavailable");
+        saved = JSON.parse(value);
+      }
     },
     document: {
       querySelector: element, createElement: element, addEventListener() {}
@@ -101,6 +104,19 @@ test("focus stays paused during an earned break", async () => {
   app.advance(5 * 60 * 1000);
   assert.equal(app.element("#timer-value").textContent, pausedTime);
   assert.equal(app.element("#timer-status").textContent, "ORBIT PAUSED");
+});
+
+test("a storage failure still completes focus and lets users spend earned credits", async () => {
+  const app = await createApp({ storageFails: true });
+  app.click("#start-button");
+  app.advance(25 * 60 * 1000);
+  assert.equal(app.element("#timer-status").textContent, "ORBIT COMPLETE");
+  assert.equal(app.element("#credit-count").textContent, 5);
+  assert.equal(app.element("#storage-status").hidden, false);
+  app.click("#spend-button");
+  assert.equal(app.element("#break-dialog").open, true);
+  assert.equal(app.element("#credit-count").textContent, 0);
+  assert.equal(app.saved(), null);
 });
 
 test("restore replaces saved data, selects its preset, and stops active focus", async () => {
