@@ -212,11 +212,19 @@ function renderActivity() {
     const row = document.createElement("article");
     const completed = new Date(session.completedAt);
     row.className = "activity-row";
-    row.innerHTML = `
-      <span class="activity-dot">✓</span>
-      <div><strong>${session.minutes}-minute focus orbit</strong><small>${completed.toLocaleDateString(undefined, { month: "short", day: "numeric" })} · ${completed.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}</small></div>
-      <span class="activity-reward">+${session.reward} min</span>
-    `;
+    const dot = document.createElement("span");
+    dot.className = "activity-dot";
+    dot.textContent = "✓";
+    const description = document.createElement("div");
+    const title = document.createElement("strong");
+    title.textContent = `${session.minutes}-minute focus orbit`;
+    const timestamp = document.createElement("small");
+    timestamp.textContent = `${completed.toLocaleDateString(undefined, { month: "short", day: "numeric" })} · ${completed.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}`;
+    description.append(title, timestamp);
+    const reward = document.createElement("span");
+    reward.className = "activity-reward";
+    reward.textContent = `+${session.reward} min`;
+    row.append(dot, description, reward);
     elements.activity.append(row);
   });
 }
