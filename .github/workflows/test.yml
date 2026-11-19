@@ -1,0 +1,28 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        timezone: [America/New_York, Pacific/Auckland]
+    env:
+      TZ: ${{ matrix.timezone }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm test
+      - name: Check JavaScript syntax
+        run: |
+          node --check src/app.js
+          node --check src/core.js
+          node --check sw.js
